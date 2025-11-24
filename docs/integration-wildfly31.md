@@ -8,13 +8,13 @@
 ## Installation du module
 1. Compiler le projet : `mvn package`.
 2. Copier `target/idp-jaspi-module-1.0.0.jar` dans `$WILDFLY_HOME/modules/com/example/idp/main/`.
-3. Copier également `module.xml` dans le même répertoire.
+3. Copier également `module.xml` dans le même répertoire. Vérifiez que le nom du JAR dans `module.xml` correspond bien à la version copiée (par défaut `idp-jaspi-module-1.0.0.jar`).
 
 ## module.xml
 ```
 <module xmlns="urn:jboss:module:1.9" name="com.example.idp">
     <resources>
-        <resource-root path="idp-jaspi-module.jar"/>
+        <resource-root path="idp-jaspi-module-1.0.0.jar"/>
     </resources>
     <dependencies>
         <module name="jakarta.servlet.api"/>
@@ -43,6 +43,19 @@ Dans `login-config.xml` :
     <auth-module code="com.example.idp.IdpServerAuthModule" module="com.example.idp"/>
 </login-config>
 ```
+
+## Dépannage
+
+### Erreur « Failed to load module org.wildfly.extension.jaspic » au démarrage
+
+Sur WildFly 31, aucune extension `org.wildfly.extension.jaspic` n'est fournie. Si vous avez ajouté une entrée
+`<extension module="org.wildfly.extension.jaspic"/>` ou un sous-système associé dans `standalone.xml`, le serveur ne
+trouvera pas le module et s'arrêtera avec l'erreur `WFLYCTL0083: Failed to load module`.
+
+**Solution**
+- Retirez toute déclaration d'extension ou de sous-système `jaspic` de `standalone.xml`.
+- Redémarrez WildFly ; le module `com.example.idp` reste utilisable via le domaine de sécurité et la configuration JASPIC
+  décrits ci-dessus, sans extension supplémentaire.
 
 ## Exemple web.xml
 ```
